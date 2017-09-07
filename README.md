@@ -1,192 +1,401 @@
-# JavaScript Reduce
+# Filter
 
 ## Overview
-
-In this lesson, we'll look at how to reduce a list to a single value.
+In this lesson, we'll look at how to filter the elements in an array based on a condition.
 
 ## Objectives
-
-1. Explain the concept of reduce() in programming
-2. Write a function that accepts a function as one of its arguments
-3. Build small pieces of code that can be used later
+1. Explain the concept of filtering an array.
+2. Write a `filter()` function that accepts a function as one of its arguments.
+3. Understand what a _callback function_ is.
+4. Define what makes a function _pure_ and explain why _pure functions_ are often preferable to _impure functions_.
 
 ## Introduction
-In the world of programming, we often work with lists. Sometimes we want to transform elements in that list to another value — but other times, we want to **aggregate** a result. In other words, we want to _reduce_ a list to a single value — it could be, for example, a string, a number, a boolean.
+In the world of programming, we often work with arrays, and there are a few common actions you'll see repeated over and over. One of the most common is transforming every element in an array to another value; for example, taking an array of numbers and squaring each one (`[1, 2, 3]` -> `[1, 4, 9]`). Another common action is searching through the array and only returning elements that match a certain condition. For example, taking the same array of numbers and only returning values greater than one (`[1, 2, 3]` -> `[2, 3]`).
 
-![Amazing parking job](http://www.carcrushing.com/wp-content/uploads/2014/11/Bad-Parking-Jobs-Car-Crushing-004.jpg)
+In the JavaScript world, we refer to that search process as _filtering_ an array, and in this lesson we're going to build our own `filter()` function.
 
-For example, let's say our friend is really bad at parking. We have an entire stack of his parking fees in front of us. Wouldn't it be great if we could reduce all of those parking fees to a single total value? Then we can tell him how much he owes the city for his obnoxious behavior. Shame on him.
-
-## Coupon Queen
-![Honey Boo Boo](https://media.giphy.com/media/ponvUa3urCwJq/giphy.gif)
-
-Let's pretend we're Honey Boo Boo. Bored from parading around in beauty pageants, we decide to take up another hobby — programming. This might even help out Mama June, the Coupon Queen! Pulling up some store data, we're interested in getting a total price of all products that have a discount of 50% or more. The store data looks like this:
-
+## Filter
+Imagine that we have a collection of Flatbook user objects in an array:
 ```js
-const products = [
-  { name: 'Head & Shoulders Shampoo', price: 4.99, discount: .6 },
-  { name: 'Twinkies', price: 7.99, discount: .45 },
-  { name: 'Oreos', price: 6.49, discount: .8 },
-  { name: 'Jasmine-scented bath pearls', price: 13.99, discount: .7 },
+const users = [
+  {
+    firstName: 'Niky',
+    lastName: 'Morgan',
+    favoriteColor: 'Blue',
+    favoriteAnimal: 'Jaguar'
+  },
+  {
+    firstName: 'Tracy',
+    lastName: 'Lum',
+    favoriteColor: 'Yellow',
+    favoriteAnimal: 'Penguin'
+  },
+  {
+    firstName: 'Josh',
+    lastName: 'Rowley',
+    favoriteColor: 'Blue',
+    favoriteAnimal: 'Penguin'
+  },
+  {
+    firstName: 'Kate',
+    lastName: 'Travers',
+    favoriteColor: 'Red',
+    favoriteAnimal: 'Jaguar'
+  },
+  {
+    firstName: 'Avidor',
+    lastName: 'Turkewitz',
+    favoriteColor: 'Blue',
+    favoriteAnimal: 'Penguin'
+  },
+  {
+    firstName: 'Drew',
+    lastName: 'Price',
+    favoriteColor: 'Yellow',
+    favoriteAnimal: 'Elephant'
+  }
 ];
 ```
 
-This means that we're essentially going to reduce the array of products to a _single value_ — in this case the total price of all products that qualify. Let's create a function that has an initial value, then iterates the given products and adds their price to the total price if its discount is higher than 50% (represented as `.5` in our code). When the loop has finished, we return our `totalPrice` result:
-
+It's easy enough to iterate over that collection and print out everyone's first name:
 ```js
-function getTotalAmountForProducts(products) {
-  let totalPrice = 0;
+function firstNamePrinter (collection) {
+  for (const user of collection) {
+    console.log(user.firstName);
+  }
+}
 
-  products.forEach(product => {
-    if (product.discount >= .5) {
-      totalPrice += product.price;
+firstNamePrinter(users);
+// LOG: Niky
+// LOG: Tracy
+// LOG: Josh
+// LOG: Kate
+// LOG: Avidor
+// LOG: Drew
+```
+
+It's also not too difficult to print out only users whose favorite color is blue:
+```js
+function blueFilter (collection) {
+  for (const user of collection) {
+    if (user.favoriteColor === 'Blue') {
+      console.log(user.firstName);
     }
-  });
-
-  return totalPrice;
-}
-
-console.log(getTotalAmountForProducts(products)); // prints 25.5
-```
-
-Great! We now have a way to add together the prices of the products we're interested in. But what if the condition was not to have a discount of 50% or more, but rather that the product has to cost 7 dollars or less? That means we'd have to rewrite our logic in the loop!
-
-Instead, maybe we can pass in a function as a second argument. That would save us having to rewrite our `getTotalAmountForProducts()` function if our logic changes. We'll add a callback that handles this logic for us, so that part is abstracted away. The callback has to return a value that is then set to the `totalPrice`. Its arguments are:
-
-- the `totalPrice` variable (to add the price of the product to it)
-- the `product` currently in the loop so we can access its price
-
-```js
-function getTotalAmountForProducts(products, callback) {
-  let totalPrice = 0;
-
-  products.forEach(product => {
-    totalPrice = callback(totalPrice, product);
-  });
-
-  return totalPrice;
-}
-
-function callback(totalPrice, product) {
-  if (product.discount >= .5) {
-    return totalPrice + product.price;
   }
-  return totalPrice;
 }
 
-console.log(getTotalAmountForProducts(products, callback)); // prints 25.5
+blueFilter(users);
+// LOG: Niky
+// LOG: Josh
+// LOG: Avidor
 ```
 
-We could have passed in an anonymous function too, but declaring the function like this makes our code a little more readable. Totally optional, though!
-
-As you can see, we can easily change the callback to tweak things accordingly. Going back to our earlier problem, now we're interested in the total price for products that cost less than 7 dollars. Luckily, since we're now completely in control of the logic, it should be straight-forward to change:
-
+Now what if we want to filter our collection of users for those whose favorite color is red? We could define an entirely new function, `redFilter()`, but that seems wasteful. Instead, let's just pass in the color that we want to filter for:
 ```js
-function callback(totalPrice, product) {
-  if (product.price < 7) {
-    return totalPrice + product.price;
+function colorFilter (collection, color) {
+  for (const user of collection) {
+    if (user.favoriteColor === color) {
+      console.log(user.firstName);
+    }
   }
-  return totalPrice;
 }
 
-console.log(getTotalAmountForProducts(products, callback)); // prints 11.5
+colorFilter(users, 'Red');
+// LOG: Kate
 ```
 
-Nice! This illustrates how powerful our abstraction is becoming.
-
-Time to take things a step further. Let's pretend we already have some items in our shopping basket (that, when combined, also have a total price). We'll make things easy for Mama June — we don't want her to add two numbers together. We can do that for her by passing in an *initial value* to our function, instead of automatically setting it to `0`.
-
+Nice, we've extracted some of the hard-coded logic out of the function, making it more generic and reusable. However, now we want to filter our users based on whose favorite animal is a jaguar, and our `colorFilter()` won't work. Let's abstract the function a bit further:
 ```js
-function getTotalAmountForProducts(products, callback, initialValue) {
-  let totalPrice = initialValue;
-
-  products.forEach(product => {
-    totalPrice = callback(totalPrice, product);
-  });
-
-  return totalPrice;
-}
-
-function callback(totalPrice, product) {
-  if (product.price < 7) {
-    return totalPrice + product.price;
+function filter (collection, attribute, value) {
+  for (const user of collection) {
+    if (user[attribute] === value) {
+      console.log(user.firstName);
+    }
   }
-  return totalPrice;
 }
 
-console.log(getTotalAmountForProducts(products, callback, 0)); // still prints 11.5. Yeah!
+filter(users, 'favoriteAnimal', 'Jaguar');
+// LOG: Niky
+// LOG: Kate
 ```
 
-To further illustrate how powerful our abstraction is becoming, we'll make our function more generic. Going back to the introduction of this lesson, we talked about *reducing* an array to another value. So, let's call our function `reduce` and change some other variable names to make it more generic:
-
+This is getting slightly ridiculous by this point. That is **way** too much logic to be putting on the shoulders of our poor little filter function. Let's extract the comparison logic into a separate function:
 ```js
-function reduce(collection, callback, initialValue) {
-  let result = initialValue;
-
-  collection.forEach(product => {
-    result = callback(result, product);
-  });
-
-  return result;
+function filter (collection) {
+  for (const user of collection) {
+    if (likesElephants(user)) {
+      console.log(user.firstName);
+    }
+  }
 }
-```
 
-Finally, as the finishing touch, we'll also pass the index of the loop, as well as the entire collection as an argument to the callback. The callback doesn't *have* to use these arguments, but they're there if we need them:
-
-```js
-function reduce(collection, callback, initialValue) {
-  let result = initialValue;
-
-  collection.forEach((product, index) => {
-    result = callback(result, product, index, collection);
-  });
-
-  return result;
+function likesElephants (user) {
+  return user['favoriteAnimal'] === 'Elephant';
 }
+
+filter(users);
+// LOG: Drew
 ```
 
-## Hard work pays off
-![Congrats!](https://media.giphy.com/media/b7oW9sR0wcr2U/giphy.gif)
+That separation of concerns feels nice. `filter()` doesn't remotely care what happens inside `likesElephants()`; it simply delegates the comparison and then trusts that `likesElephants()` correctly returns `true` or `false`. We're almost at the finish line, but there's one final abstraction we can make: right now, our `filter()` function can only make comparisons using `likesElephants()`. If we want to use a different comparison function, we'd have to rewrite `filter()`. However, there is... another way.
 
-To prove that our implementation is sufficiently abstract, we'll use it for a completely different purpose. Let's count the number of coupons Mama June has lying around the house:
+<picture>
+  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.webp" type="image/webp">
+  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.gif" type="image/gif">
+  <img src="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.gif" alt="Maybe there's another way.">
+</picture>
 
+## Passing functions
+We know we can pass numbers, strings, objects, and arrays into a function as arguments, but did you know we can also **pass functions into other functions**? We'll go into this in much greater depth in an upcoming lesson, but it's important to start thinking about this concept now: in JavaScript, **functions are objects**. Specifically, they are objects with a special, hidden code property that can be invoked. This is how we pass an object into a function:
 ```js
-const couponLocations = [
-  { room: 'Living room', amount: 5 },
-  { room: 'Kitchen', amount: 2 },
-  { room: 'Bathroom', amount: 1 },
-  { room: 'Master bedroom', amount: 7 },
+function iReturnThings (thing) {
+  return thing;
+}
+
+iReturnThings({ firstName: 'Brendan', lastName: 'Eich' });
+// => {firstName: "Brendan", lastName: "Eich"}
+```
+
+And this is how we pass a function into a function:
+```js
+iReturnThings(function () { return 4 + 5; });
+// => ƒ () { return 4 + 5; }
+```
+
+Notice that a representation of the passed-in function was returned, but **it was not invoked**. The `iReturnThings()` function accepted the passed-in function as its lone argument, `thing`. As with all arguments, `thing` was then available everywhere inside `iReturnThings()` as a local variable. When we passed a function into `iReturnThings()`, the `thing` variable contained that function. Currently, all `iReturnThings()` does is return whatever value is stored inside `thing`. However, if we know `thing` contains a function, we can do a piece of awesome, function-y magic to it: **we can invoke it** and return the result:
+```js
+function iInvokeThings (thing) {
+  return thing();
+}
+
+iInvokeThings(function () { return 4 + 5; });
+// => 9
+
+iInvokeThings(function () { return 'Hello, ' + 'world!'; });
+// => "Hello, world!"
+```
+
+We pass in a function as the lone argument, store it inside the `thing` variable, and then use the invocation operator (a pair of parentheses) to invoke the stored function: `thing()`.
+
+***NOTE***: As we dive deeper and deeper into functional programming in JavaScript, it bears repeating: this is **very** complicated material! JavaScript isn't the only language to treat functions as first-class objects, but it's by far the most common and likely the first time you're encountering any of this stuff. If you're struggling with the new concepts, don't sweat it! Set aside some extra time to re-read and practice, and make sure you're coding along with every example we cover in the lessons.
+
+### Callback functions
+If you've done any outside reading on JavaScript, you've probably come across the name of the pattern we just introduced: _callback functions_. When we pass a function into another function wherein it might be invoked, we refer to the passed function as a _callback_. The term derives from the fact that the function isn't invoked immediately — instead it's _called back_, or invoked at a later point.
+
+You may have noticed, but all of our callback functions so far have been _anonymous functions_; that is, we haven't assigned them an identifier. You're welcome to name your callback functions if you'd like, but generally it just clutters things up. And, anyway, we already have a way to refer to them: by the name of the parameter into which they're passed! For example:
+```js
+function main (cb) {
+  console.log(cb());
+}
+
+main(function () { return "After I get passed to the main() function as the only argument, I'm stored in the local 'cb' variable!"});
+// LOG: After I get passed to the main() function as the only argument, I'm stored in the local 'cb' variable!
+```
+
+1. We passed an anonymous function as the lone argument to our invocation of `main()`.
+2. `main()` stored the passed-in function in the local `cb` variable and then invoked the callback function.
+3. The invoked callback returned its long string, which was `console.log()`-ed out in `main()`.
+
+Because a callback function is invoked inside another function, we can forward to it any arguments passed to the outer function. For example:
+```js
+function greet (name, cb) {
+  return cb(name);
+}
+
+greet('Ada Lovelace', function (name) { return 'Hello there, ' + name; });
+// => "Hello there, Ada Lovelace"
+
+function doMath (num1, num2, cb) {
+  return cb(num1, num2);
+}
+
+doMath(42, 8, function (num1, num2) { return num1 * num2; });
+// => 336
+```
+
+This behavior makes callbacks the perfect companion for structuring our `filter()` function in a slim, reusable way:
+```js
+const users = [
+  { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
+  { firstName: 'Tracy',  lastName: 'Lum',       favoriteColor: 'Yellow', favoriteAnimal: 'Penguin' },
+  { firstName: 'Josh',   lastName: 'Rowley',    favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
+  { firstName: 'Kate',   lastName: 'Travers',   favoriteColor: 'Red',    favoriteAnimal: 'Jaguar' },
+  { firstName: 'Avidor', lastName: 'Turkewitz', favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
+  { firstName: 'Drew',   lastName: 'Price',     favoriteColor: 'Yellow', favoriteAnimal: 'Elephant' }
 ];
 
-function couponCounter(totalAmount, location) {
-  return totalAmount + location.amount;
+function filter (collection, cb) {
+  for (const user of collection) {
+    if (cb(user)) {
+      console.log(user.firstName);
+    }
+  }
 }
 
-console.log(reduce(couponLocations, couponCounter, 0)); // prints 15
+filter(users, function (user) { return user.favoriteColor === 'Blue' && user.favoriteAnimal === 'Penguin'; });
+// LOG: Josh
+// LOG: Avidor
+
+filter(users, function (user) { return user.favoriteColor === 'Yellow'; });
+// LOG: Tracy
+// LOG: Drew
 ```
 
-What if we already have three coupons in our hand? We can easily account for that by adjusting the initial value:
+Our `filter()` function doesn't know or care about any of the comparison logic encapsulated in the callback function. All it does is take in a collection and a callback and `console.log()` out the `firstName` of every `user` object that makes the callback return `true`.
 
+### Pure functions
+One final note about `filter()` and manipulating objects in JavaScript. We touched on this in the discussions of _destructive_ and _nondestructive_ operations, but there's some function-specific terminology that's important to know. A function in JavaScript can be _pure_ or _impure_.
+
+If a _pure function_ is repeatedly invoked with the same set of arguments, the function will **always return the same result**. Its behavior is predictable. Additionally, invoking the function has no external side-effects such as making a network or database call or altering any object(s) passed to it as an argument.
+
+_Impure functions_ are the opposite: the return value is not predictable, and invoking the function might make network or database calls or alter any objects passed in as arguments.
+
+This function is impure because the return value is not predictable:
 ```js
-console.log(reduce(couponLocations, couponCounter, 3)); // prints 18
+function randomMultiplyAndFloor () {
+  return Math.floor(Math.random() * 100);
+}
+
+randomMultiplyAndFloor();
+// => 53
+randomMultiplyAndFloor();
+// => 66
 ```
 
-## On the shoulders of giants
-
-![A programmer in its natural habitat.](https://media.giphy.com/media/129fSchexp3aPC/giphy.gif)
-
-Fortunately, all programmers are inherently lazy. Who wants to write this stuff over and over again? Don't despair — it seems someone has already done the hard work for us! `Array.prototype.reduce()` is an array method which does _exactly_ the same thing as our own `reduce()` function. So, no need to port over our `reduce()` function to all of our projects — **it's already in the standard JS library**. Don't feel misled, now you know exactly how reduce works!
-
-The proof is in the pudding, so let's take the native implementation for a spin:
-
+This one's impure because it alters the passed-in object:
 ```js
-console.log(couponLocations.reduce(couponCounter, 0)); // also prints 15!
+const ada = {
+  name: 'Ada Lovelace',
+  age: 202
+};
+
+function happyBirthday (person) {
+  console.log(`Happy birthday, ${person.name}! You're ${++person.age} years old!`);
+}
+
+happyBirthday(ada);
+// LOG: Happy birthday, Ada Lovelace! You're 203 years old!
+
+happyBirthday(ada);
+// LOG: Happy birthday, Ada Lovelace! You're 204 years old!
+
+ada;
+// => {name: "Ada Lovelace", age: 204}
 ```
 
-Same result, but without using our custom `reduce()` function. Feel free to throw it in the bin!
+When possible, it's generally good to avoid impure functions for the following two reasons:
+1. Predictable code is good. If you can be sure that a function will always return the same value when provided the same inputs, it makes writing tests for that function a cinch.
+2. Because pure functions don't have side effects, it makes debugging a lot easier. Imagine that our code errors out due to an array that doesn't contain the correct properties.
+    - If that array was returned from a pure function, our debugging process would be linear and well-scoped. We would first check what inputs were provided to the pure function. If the inputs are correct, that means the bug is inside our pure function. If the inputs aren't correct, then we figure out why they aren't correct. Case closed!
+    - If, however, the array is modified by impure functions, we'd have to follow the data around on a wild goose chase, combing through each impure function to see where and how the array is modified.
+
+***Top Tip***: The fewer places a particular object can be modified, the fewer places we have to look when debugging.
+
+Here's a pure take on our `randomMultiplyAndFloor()` function:
+```js
+function multiplyAndFloor (num) {
+  return Math.floor(num * 100);
+}
+
+const randNum = Math.random();
+
+randNum;
+// => 0.9123939589869237
+
+multiplyAndFloor(randNum);
+// => 91
+multiplyAndFloor(randNum);
+// => 91
+```
+
+And one that returns a new object instead of mutating the passed-in object:
+```js
+const adaAge202 = {
+  name: 'Ada Lovelace',
+  age: 202
+};
+
+function happyBirthday (person) {
+  const newPerson = Object.assign({}, person, { age: person.age + 1 });
+
+  console.log(`Happy birthday, ${newPerson.name}! You're ${newPerson.age} years old!`);
+
+  return newPerson;
+}
+
+const adaAge203 = happyBirthday(adaAge202);
+// LOG: Happy birthday, Ada Lovelace! You're 203 years old!
+
+adaAge202;
+// => {name: "Ada Lovelace", age: 202}
+
+adaAge203;
+// => {name: "Ada Lovelace", age: 203}
+```
+
+## Tying it all together
+As a final challenge, let's rewrite our `filter()` function as a pure function that returns a new array containing the filtered elements:
+```js
+const users = [
+  { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
+  { firstName: 'Tracy',  lastName: 'Lum',       favoriteColor: 'Yellow', favoriteAnimal: 'Penguin' },
+  { firstName: 'Josh',   lastName: 'Rowley',    favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
+  { firstName: 'Kate',   lastName: 'Travers',   favoriteColor: 'Red',    favoriteAnimal: 'Jaguar' },
+  { firstName: 'Avidor', lastName: 'Turkewitz', favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
+  { firstName: 'Drew',   lastName: 'Price',     favoriteColor: 'Yellow', favoriteAnimal: 'Elephant' }
+];
+
+function filter (collection, cb) {
+  const newCollection = [];
+
+  for (const user of collection) {
+    if (cb(user)) {
+      newCollection.push(user);
+    }
+  }
+
+  return newCollection;
+}
+
+const bluePenguinUsers = filter(users, function (user) { return user.favoriteColor === 'Blue' && user.favoriteAnimal === 'Penguin'; });
+
+bluePenguinUsers;
+// => [{ firstName: "Josh", lastName: "Rowley", favoriteColor: "Blue", favoriteAnimal: "Penguin" }, { firstName: "Avidor", lastName: "Turkewitz", favoriteColor: "Blue", favoriteAnimal: "Penguin" }]
+
+const yellowUsers = filter(users, function (user) { return user.favoriteColor === 'Yellow'; });
+
+yellowUsers;
+// => [{ firstName: "Tracy", lastName: "Lum", favoriteColor: "Yellow", favoriteAnimal: "Penguin" }, { firstName: "Drew", lastName: "Price", favoriteColor: "Yellow", favoriteAnimal: "Elephant" }]
+
+users.length;
+// => 6
+```
+
+Woohoo! We successfully built a clone of JavaScript's built-in `.filter()` array method!
+
+Wait... **a** ***clone?!***
+
+<picture>
+  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.webp" type="image/webp">
+  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.gif" type="image/gif">
+  <img src="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.gif" alt="Our journey has never been one of shortcuts or settling for less.">
+</picture>
+
+Yep, sorry about that. All JavaScript arrays come with their own `.filter()` method:
+```js
+[1, 2, 3, 4, 5].filter(function (num) { return num > 3; });
+// => [4, 5]
+```
+
+The method accepts one argument, a callback function that it will invoke with each element in the array. For each element passed to the callback, if the callback's return value is truthy, that element is copied into a new array. If the callback's return value is falsy, the element is filtered out. After iterating over every element in the collection, `.filter()` returns the new array.
+
+Now that you've built your own `filter()` method, you have a much deeper grasp of how JavaScript's built-in `Array.prototype.filter()` method works.
 
 ## Resources
+* [MDN — `Array.prototype.filter()`][filter]
+* [Tutorial Horizon — Pure vs. Impure Functions][pure]
 
-* [MDN: Array.prototype.reduce()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce)
+[filter]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+[pure]: http://javascript.tutorialhorizon.com/2016/04/24/pure-vs-impure-functions/
 
-<p class='util--hide'>View <a href='https://learn.co/lessons/javascript-reduce'>Reduce</a> on Learn.co and start learning to code for free.</p>
+<p class='util--hide'>View <a href='https://learn.co/lessons/js-looping-and-iteration-filter-readme'>Filter</a> on Learn.co and start learning to code for free.</p>
