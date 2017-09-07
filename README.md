@@ -1,7 +1,7 @@
 # Filter
 
 ## Overview
-In this lesson, we'll look at how to filter the elements in an array based on a condition.
+In this lesson, we'll look at how to return a subset of the elements in an array based on a condition.
 
 ## Objectives
 1. Explain the concept of filtering an array.
