@@ -1,6 +1,12 @@
 tags:
-  - javascript
+  - array
+  - filter
+  - debugging
+  - iteration
+  - callback
+  - pure
+  - functions
+  - readme
 languages:
   - javascript
-resources:
-  - 1
+resources: 2
