@@ -162,7 +162,7 @@ iReturnThings(function () { return 4 + 5; });
 // => ƒ () { return 4 + 5; }
 ```
 
-Notice that a representation of the passed-in function was returned, but **it was not invoked**. The `iReturnThings()` function accepted the passed-in function as its lone argument, `thing`. As with all arguments, `thing` was then available everywhere inside `iReturnThings()` as a local variable. When we passed a function into `iReturnThings()`, the `thing` variable contained that function. Currently, all `iReturnThings()` does is return whatever value is stored inside `thing`. However, if we know `thing` contains a function, we can do a piece of awesome, function-y magic to it: **we can invoke it** and return the result:
+Notice that a representation of the passed-in function was returned, but **it was not invoked**. The `iReturnThings()` function accepted the passed-in function as its lone argument, `thing`. As with all arguments, `thing` was then available everywhere inside `iReturnThings()` as a local variable. When we passed a function into `iReturnThings()`, the `thing` variable contained that function. Currently, all `iReturnThings()` does is return whatever value is stored inside `thing`. However, if we know `thing` contains a function, we can do a piece of awesome, function-y magic to it: **we can invoke it** and return the function's result:
 ```js
 function iInvokeThings (thing) {
   return thing();
@@ -192,7 +192,7 @@ main(function () { return "After I get passed to the main() function as the only
 // LOG: After I get passed to the main() function as the only argument, I'm stored in the local 'cb' variable!
 ```
 
-1. We passed an anonymous function as the lone argument to our invocation of `main()`.
+1. We passed an anonymous function, `function () { return "After I get passed... }`, as the lone argument to our invocation of `main()`.
 2. `main()` stored the passed-in function in the local `cb` variable and then invoked the callback function.
 3. The invoked callback returned its long string, which was `console.log()`-ed out in `main()`.
 
