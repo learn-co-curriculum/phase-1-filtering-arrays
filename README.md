@@ -182,7 +182,7 @@ We pass in a function as the lone argument, store it inside the `thing` variable
 ### Callback functions
 If you've done any outside reading on JavaScript, you've probably come across the name of the pattern we just introduced: _callback functions_. When we pass a function into another function wherein it might be invoked, we refer to the passed function as a _callback_. The term derives from the fact that the function isn't invoked immediately — instead it's _called back_, or invoked at a later point.
 
-You may have noticed, but all of our callback functions so far have been _anonymous functions_; that is, we haven't assigned them an identifier. You're welcome to name your callback functions if you'd like, but generally it just clutters things up. And, anyway, we already have a way to refer to them: by the name of the parameter into which they're passed! For example:
+You may have noticed, but all of our callback functions so far have been _anonymous functions_; that is, we haven't assigned them an identifier. You're welcome to name your callback functions if you'd like, but generally it just clutters things up if you only use the callback function in one place. And, anyway, we already have a way to refer to them: by the name of the parameter into which they're passed! For example:
 ```js
 function main (cb) {
   console.log(cb());
