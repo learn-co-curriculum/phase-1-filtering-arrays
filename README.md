@@ -1,21 +1,26 @@
 # Filter
 
 ## Overview
+
 In this lesson, we'll look at how to return a subset of the elements in an array based on a condition.
 
 ## Objectives
+
 1. Explain the concept of filtering an array.
 2. Write a `filter()` function that accepts a function as one of its arguments.
 3. Understand what a _callback function_ is.
 4. Define what makes a function _pure_ and explain why _pure functions_ are often preferable to _impure functions_.
 
 ## Introduction
+
 In the world of programming, we often work with arrays, and there are a few common actions you'll see repeated over and over. One of the most common is transforming every element in an array to another value; for example, taking an array of numbers and squaring each one (`[1, 2, 3]` -> `[1, 4, 9]`). Another common action is searching through the array and only returning elements that match a certain condition. For example, taking the same array of numbers and only returning values greater than one (`[1, 2, 3]` -> `[2, 3]`).
 
 In the JavaScript world, we refer to that search process as _filtering_ an array, and in this lesson we're going to build our own `filter()` function.
 
 ## Filter
+
 Imagine that we have a collection of Flatbook user objects in an array:
+
 ```js
 const users = [
   {
@@ -58,6 +63,7 @@ const users = [
 ```
 
 It's easy enough to iterate over that collection and print out everyone's first name:
+
 ```js
 function firstNamePrinter (collection) {
   for (const user of collection) {
@@ -75,6 +81,7 @@ firstNamePrinter(users);
 ```
 
 It's also not too difficult to print out only users whose favorite color is blue:
+
 ```js
 function blueFilter (collection) {
   for (const user of collection) {
@@ -91,6 +98,7 @@ blueFilter(users);
 ```
 
 Now what if we want to filter our collection of users for those whose favorite color is red? We could define an entirely new function, `redFilter()`, but that seems wasteful. Instead, let's just pass in the color that we want to filter for:
+
 ```js
 function colorFilter (collection, color) {
   for (const user of collection) {
@@ -105,6 +113,7 @@ colorFilter(users, 'Red');
 ```
 
 Nice, we've extracted some of the hard-coded logic out of the function, making it more generic and reusable. However, now we want to filter our users based on whose favorite animal is a jaguar, and our `colorFilter()` won't work. Let's abstract the function a bit further:
+
 ```js
 function filter (collection, attribute, value) {
   for (const user of collection) {
@@ -120,6 +129,7 @@ filter(users, 'favoriteAnimal', 'Jaguar');
 ```
 
 This is getting slightly ridiculous by this point. That is **way** too much logic to be putting on the shoulders of our poor little filter function. Let's extract the comparison logic into a separate function:
+
 ```js
 function filter (collection) {
   for (const user of collection) {
@@ -146,7 +156,9 @@ That separation of concerns feels nice. `filter()` doesn't remotely care what ha
 </picture>
 
 ## Passing functions
+
 We know we can pass numbers, strings, objects, and arrays into a function as arguments, but did you know we can also **pass functions into other functions**? We'll go into this in much greater depth in an upcoming lesson, but it's important to start thinking about this concept now: in JavaScript, **functions are objects**. Specifically, they are objects with a special, hidden code property that can be invoked. This is how we pass an object into a function:
+
 ```js
 function iReturnThings (thing) {
   return thing;
@@ -157,12 +169,14 @@ iReturnThings({ firstName: 'Brendan', lastName: 'Eich' });
 ```
 
 And this is how we pass a function into a function:
+
 ```js
 iReturnThings(function () { return 4 + 5; });
 // => ƒ () { return 4 + 5; }
 ```
 
 Notice that a representation of the passed-in function was returned, but **it was not invoked**. The `iReturnThings()` function accepted the passed-in function as its lone argument, `thing`. As with all arguments, `thing` was then available everywhere inside `iReturnThings()` as a local variable. When we passed a function into `iReturnThings()`, the `thing` variable contained that function. Currently, all `iReturnThings()` does is return whatever value is stored inside `thing`. However, if we know `thing` contains a function, we can do a piece of awesome, function-y magic to it: **we can invoke it** and return the function's result:
+
 ```js
 function iInvokeThings (thing) {
   return thing();
@@ -179,10 +193,12 @@ We pass in a function as the lone argument, store it inside the `thing` variable
 
 ***NOTE***: As we dive deeper and deeper into functional programming in JavaScript, it bears repeating: this is **very** complicated material! JavaScript isn't the only language to treat functions as first-class objects, but it's by far the most common and likely the first time you're encountering any of this stuff. If you're struggling with the new concepts, don't sweat it! Set aside some extra time to re-read and practice, and make sure you're coding along with every example we cover in the lessons.
 
-### Callback functions
+### Callback Functions
+
 If you've done any outside reading on JavaScript, you've probably come across the name of the pattern we just introduced: _callback functions_. When we pass a function into another function wherein it might be invoked, we refer to the passed function as a _callback_. The term derives from the fact that the function isn't invoked immediately — instead it's _called back_, or invoked at a later point.
 
 You may have noticed, but all of our callback functions so far have been _anonymous functions_; that is, we haven't assigned them an identifier. You're welcome to name your callback functions if you'd like, but generally it just clutters things up if you only use the callback function in one place. And, anyway, we already have a way to refer to them: by the name of the parameter into which they're passed! For example:
+
 ```js
 function main (cb) {
   console.log(cb());
@@ -197,6 +213,7 @@ main(function () { return "After I get passed to the main() function as the only
 3. The invoked callback returned its long string, which was `console.log()`-ed out in `main()`.
 
 Because a callback function is invoked inside another function, we can forward to it any arguments passed to the outer function. For example:
+
 ```js
 function greet (name, cb) {
   return cb(name);
@@ -214,6 +231,7 @@ doMath(42, 8, function (num1, num2) { return num1 * num2; });
 ```
 
 This behavior makes callbacks the perfect companion for structuring our `filter()` function in a slim, reusable way:
+
 ```js
 const users = [
   { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
@@ -244,6 +262,7 @@ filter(users, function (user) { return user.favoriteColor === 'Yellow'; });
 Our `filter()` function doesn't know or care about any of the comparison logic encapsulated in the callback function. All it does is take in a collection and a callback and `console.log()` out the `firstName` of every `user` object that makes the callback return `true`.
 
 ### Pure functions
+
 One final note about `filter()` and manipulating objects in JavaScript. We touched on this in the discussions of _destructive_ and _nondestructive_ operations, but there's some function-specific terminology that's important to know. A function in JavaScript can be _pure_ or _impure_.
 
 If a _pure function_ is repeatedly invoked with the same set of arguments, the function will **always return the same result**. Its behavior is predictable. Additionally, invoking the function has no external side-effects such as making a network or database call or altering any object(s) passed to it as an argument.
@@ -251,6 +270,7 @@ If a _pure function_ is repeatedly invoked with the same set of arguments, the f
 _Impure functions_ are the opposite: the return value is not predictable, and invoking the function might make network or database calls or alter any objects passed in as arguments.
 
 This function is impure because the return value is not predictable:
+
 ```js
 function randomMultiplyAndFloor () {
   return Math.floor(Math.random() * 100);
@@ -263,6 +283,7 @@ randomMultiplyAndFloor();
 ```
 
 This one's impure because it alters the passed-in object:
+
 ```js
 const ada = {
   name: 'Ada Lovelace',
@@ -292,6 +313,7 @@ When possible, it's generally good to avoid impure functions for the following t
 ***Top Tip***: The fewer places a particular object can be modified, the fewer places we have to look when debugging.
 
 Here's a pure take on our `randomMultiplyAndFloor()` function:
+
 ```js
 function multiplyAndFloor (num) {
   return Math.floor(num * 100);
@@ -309,6 +331,7 @@ multiplyAndFloor(randNum);
 ```
 
 And one that returns a new object instead of mutating the passed-in object:
+
 ```js
 const adaAge202 = {
   name: 'Ada Lovelace',
@@ -334,7 +357,9 @@ adaAge203;
 ```
 
 ## Tying it all together
+
 As a final challenge, let's rewrite our `filter()` function as a pure function that returns a new array containing the filtered elements:
+
 ```js
 const users = [
   { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
@@ -382,6 +407,7 @@ Wait... **a** ***clone?!***
 </picture>
 
 Yep, sorry about that. All JavaScript arrays come with their own `.filter()` method:
+
 ```js
 [1, 2, 3, 4, 5].filter(function (num) { return num > 3; });
 // => [4, 5]
@@ -392,10 +418,9 @@ The method accepts one argument, a callback function that it will invoke with ea
 Now that you've built your own `filter()` method, you have a much deeper grasp of how JavaScript's built-in `Array.prototype.filter()` method works.
 
 ## Resources
+
 * [MDN — `Array.prototype.filter()`][filter]
 * [Tutorial Horizon — Pure vs. Impure Functions][pure]
 
 [filter]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
 [pure]: http://javascript.tutorialhorizon.com/2016/04/24/pure-vs-impure-functions/
-
-<p class='util--hide'>View <a href='https://learn.co/lessons/js-looping-and-iteration-filter-readme'>Filter</a> on Learn.co and start learning to code for free.</p>
