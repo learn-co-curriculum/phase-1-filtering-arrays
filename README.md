@@ -21,7 +21,7 @@ In the JavaScript world, we refer to that search process as _filtering_ an array
 
 Imagine that we have a collection of Flatbook user objects in an array:
 
-```js
+```
 const users = [
   {
     firstName: 'Niky',
@@ -82,7 +82,7 @@ firstNamePrinter(users);
 
 It's also not too difficult to print out only users whose favorite color is blue:
 
-```js
+```
 function blueFilter (collection) {
   for (const user of collection) {
     if (user.favoriteColor === 'Blue') {
@@ -99,7 +99,7 @@ blueFilter(users);
 
 Now what if we want to filter our collection of users for those whose favorite color is red? We could define an entirely new function, `redFilter()`, but that seems wasteful. Instead, let's just pass in the color that we want to filter for:
 
-```js
+```
 function colorFilter (collection, color) {
   for (const user of collection) {
     if (user.favoriteColor === color) {
@@ -114,7 +114,7 @@ colorFilter(users, 'Red');
 
 Nice, we've extracted some of the hard-coded logic out of the function, making it more generic and reusable. However, now we want to filter our users based on whose favorite animal is a jaguar, and our `colorFilter()` won't work. Let's abstract the function a bit further:
 
-```js
+```
 function filter (collection, attribute, value) {
   for (const user of collection) {
     if (user[attribute] === value) {
@@ -130,7 +130,7 @@ filter(users, 'favoriteAnimal', 'Jaguar');
 
 This is getting slightly ridiculous by this point. That is **way** too much logic to be putting on the shoulders of our poor little filter function. Let's extract the comparison logic into a separate function:
 
-```js
+```
 function filter (collection) {
   for (const user of collection) {
     if (likesElephants(user)) {
@@ -159,7 +159,7 @@ That separation of concerns feels nice. `filter()` doesn't remotely care what ha
 
 We know we can pass numbers, strings, objects, and arrays into a function as arguments, but did you know we can also **pass functions into other functions**? We'll go into this in much greater depth in an upcoming lesson, but it's important to start thinking about this concept now: in JavaScript, **functions are objects**. Specifically, they are objects with a special, hidden code property that can be invoked. This is how we pass an object into a function:
 
-```js
+```
 function iReturnThings (thing) {
   return thing;
 }
@@ -170,14 +170,14 @@ iReturnThings({ firstName: 'Brendan', lastName: 'Eich' });
 
 And this is how we pass a function into a function:
 
-```js
+```
 iReturnThings(function () { return 4 + 5; });
 // => ƒ () { return 4 + 5; }
 ```
 
 Notice that a representation of the passed-in function was returned, but **it was not invoked**. The `iReturnThings()` function accepted the passed-in function as its lone argument, `thing`. As with all arguments, `thing` was then available everywhere inside `iReturnThings()` as a local variable. When we passed a function into `iReturnThings()`, the `thing` variable contained that function. Currently, all `iReturnThings()` does is return whatever value is stored inside `thing`. However, if we know `thing` contains a function, we can do a piece of awesome, function-y magic to it: **we can invoke it** and return the function's result:
 
-```js
+```
 function iInvokeThings (thing) {
   return thing();
 }
@@ -199,7 +199,7 @@ If you've done any outside reading on JavaScript, you've probably come across th
 
 You may have noticed, but all of our callback functions so far have been _anonymous functions_; that is, we haven't assigned them an identifier. You're welcome to name your callback functions if you'd like, but generally it just clutters things up if you only use the callback function in one place. And, anyway, we already have a way to refer to them: by the name of the parameter into which they're passed! For example:
 
-```js
+```
 function main (cb) {
   console.log(cb());
 }
@@ -214,7 +214,7 @@ main(function () { return "After I get passed to the main() function as the only
 
 Because a callback function is invoked inside another function, we can forward to it any arguments passed to the outer function. For example:
 
-```js
+```
 function greet (name, cb) {
   return cb(name);
 }
@@ -232,7 +232,7 @@ doMath(42, 8, function (num1, num2) { return num1 * num2; });
 
 This behavior makes callbacks the perfect companion for structuring our `filter()` function in a slim, reusable way:
 
-```js
+```
 const users = [
   { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
   { firstName: 'Tracy',  lastName: 'Lum',       favoriteColor: 'Yellow', favoriteAnimal: 'Penguin' },
@@ -271,7 +271,7 @@ _Impure functions_ are the opposite: the return value is not predictable, and in
 
 This function is impure because the return value is not predictable:
 
-```js
+```
 function randomMultiplyAndFloor () {
   return Math.floor(Math.random() * 100);
 }
@@ -284,7 +284,7 @@ randomMultiplyAndFloor();
 
 This one's impure because it alters the passed-in object:
 
-```js
+```
 const ada = {
   name: 'Ada Lovelace',
   age: 202
@@ -314,7 +314,7 @@ When possible, it's generally good to avoid impure functions for the following t
 
 Here's a pure take on our `randomMultiplyAndFloor()` function:
 
-```js
+```
 function multiplyAndFloor (num) {
   return Math.floor(num * 100);
 }
@@ -332,7 +332,7 @@ multiplyAndFloor(randNum);
 
 And one that returns a new object instead of mutating the passed-in object:
 
-```js
+``
 const adaAge202 = {
   name: 'Ada Lovelace',
   age: 202
@@ -360,7 +360,7 @@ adaAge203;
 
 As a final challenge, let's rewrite our `filter()` function as a pure function that returns a new array containing the filtered elements:
 
-```js
+```
 const users = [
   { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
   { firstName: 'Tracy',  lastName: 'Lum',       favoriteColor: 'Yellow', favoriteAnimal: 'Penguin' },
@@ -408,7 +408,7 @@ Wait... **a** ***clone?!***
 
 Yep, sorry about that. All JavaScript arrays come with their own `.filter()` method:
 
-```js
+```
 [1, 2, 3, 4, 5].filter(function (num) { return num > 3; });
 // => [4, 5]
 ```
