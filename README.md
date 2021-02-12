@@ -82,7 +82,7 @@ firstNamePrinter(users);
 
 It's also not too difficult to print out only users whose favorite color is blue:
 
-``js
+```js
 function blueFilter (collection) {
   for (const user of collection) {
     if (user.favoriteColor === 'Blue') {
