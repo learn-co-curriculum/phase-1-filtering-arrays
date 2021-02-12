@@ -332,7 +332,7 @@ multiplyAndFloor(randNum);
 
 And one that returns a new object instead of mutating the passed-in object:
 
-``
+```
 const adaAge202 = {
   name: 'Ada Lovelace',
   age: 202
