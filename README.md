@@ -2,28 +2,24 @@
 
 ## Learning Goals
 
-- Explain the concept of filtering an array.
-- Write a `filter()` function that accepts a function as one of its arguments.
-- Understand what a _callback function_ is.
+- Explain the concept of filtering an array
+- Build our own version of JavaScript's `Array.prototype.filter()` method
 - Define what makes a function _pure_ and explain why _pure functions_ are often
-  preferable to _impure functions_.
+  preferable to _impure functions_
+- Use `Array.prototype.filter()`
 
 ## Introduction
 
-In the world of programming, we often work with arrays, and there are a few
-common actions you'll see repeated over and over. One of the most common is
-transforming every element in an array to another value; for example, taking an
-array of numbers and squaring each one (`[1, 2, 3]` -> `[1, 4, 9]`). Another
-common action is searching through the array and only returning elements that
-match a certain condition. For example, taking the same array of numbers and
-only returning values greater than one (`[1, 2, 3]` -> `[2, 3]`).
-
-In the JavaScript world, we refer to that search process as _filtering_ an
-array, and in this lesson we're going to build our own `filter()` function.
+We've seen the `Array` methods available in JavaScript to find a _single_
+element, but sometimes we want to return _all_ elements that match a certain
+condition. For example, we might want to search through an array and return
+values greater than one (`[1, 2, 3]` -> `[2, 3]`). In the JavaScript world, we
+refer to that search process as _filtering_ an array. In this lesson we're
+going to build our own `filter()` function.
 
 ## Filter
 
-Imagine that we have a collection of Flatbook user objects in an array:
+Let's revisit our array of Flatbook user objects:
 
 ```js
 const users = [
@@ -66,8 +62,8 @@ const users = [
 ];
 ```
 
-It's easy enough to iterate over that collection and print out everyone's first
-name:
+To review, we know we can iterate over that collection and print out everyone's
+first name:
 
 ```js
 function firstNamePrinter (collection) {
@@ -85,8 +81,7 @@ firstNamePrinter(users);
 // LOG: Drew
 ```
 
-It's also not too difficult to print out only users whose favorite color is
-blue:
+We also know how to print out only users whose favorite color is blue:
 
 ```js
 function blueFilter (collection) {
@@ -106,7 +101,7 @@ blueFilter(users);
 Now what if we want to filter our collection of users for those whose favorite
 color is red? We could define an entirely new function, `redFilter()`, but that
 seems wasteful. Instead, let's just pass in the color that we want to filter
-for:
+for as an argument:
 
 ```js
 function colorFilter (collection, color) {
@@ -121,10 +116,10 @@ colorFilter(users, 'Red');
 // LOG: Kate
 ```
 
-Nice, we've extracted some of the hard-coded logic out of the function, making
+Nice! We've extracted some of the hard-coded logic out of the function, making
 it more generic and reusable. However, now we want to filter our users based on
-whose favorite animal is a jaguar, and our `colorFilter()` won't work. Let's
-abstract the function a bit further:
+whose favorite animal is a jaguar, and our `colorFilter()` function won't work.
+Let's abstract the function a bit further:
 
 ```js
 function filter (collection, attribute, value) {
@@ -135,14 +130,33 @@ function filter (collection, attribute, value) {
   }
 }
 
-filter(users, 'favoriteAnimal', 'Jaguar');
+filter(users, 'favoriteAnimal', 'Jaguar', );
 // LOG: Niky
 // LOG: Kate
+
+```
+
+So our function is definitely getting more abstract, but what if we wanted to
+filter by two attributes? We'd have to do something like this:
+
+```js
+function filter (collection, attribute1, value1, attribute2, value2) {
+  for (const user of collection) {
+    if (user[attribute1] === value1 && user[attribute2] === value2) {
+      console.log(user.firstName);
+    }
+  }
+}
+
+filter(users, 'favoriteAnimal', 'Jaguar', 'favoriteColor', 'Blue');
+// LOG: Niky
+
 ```
 
 This is getting slightly ridiculous by this point. That is **way** too much
-logic to be putting on the shoulders of our poor little filter function. Let's
-extract the comparison logic into a separate function:
+logic to be putting on the shoulders of our poor little filter function. Plus,
+now our filter will only work if we're filtering by two attributes. To fix this,
+we can extract the comparison logic into a separate function:
 
 ```js
 function filter (collection) {
@@ -167,7 +181,7 @@ trusts that `likesElephants()` correctly returns `true` or `false`. We're almost
 at the finish line, but there's one final abstraction we can make: right now,
 our `filter()` function can only make comparisons using `likesElephants()`. If
 we want to use a different comparison function, we'd have to rewrite `filter()`.
-However, there is... another way.
+However, there is another way: we can use a callback function!
 
 <picture>
   <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.webp" type="image/webp">
@@ -175,118 +189,7 @@ However, there is... another way.
   <img src="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.gif" alt="Maybe there's another way.">
 </picture>
 
-## Passing functions
-
-We know we can pass numbers, strings, objects, and arrays into a function as
-arguments, but did you know we can also **pass functions into other functions**?
-We'll go into this in much greater depth in an upcoming lesson, but it's
-important to start thinking about this concept now: in JavaScript, **functions
-are objects**. Specifically, they are objects with a special, hidden code
-property that can be invoked. This is how we pass an object into a function:
-
-```js
-function iReturnThings (thing) {
-  return thing;
-}
-
-iReturnThings({ firstName: 'Brendan', lastName: 'Eich' });
-// => {firstName: "Brendan", lastName: "Eich"}
-```
-
-And this is how we pass a function into a function:
-
-```js
-iReturnThings(function () { return 4 + 5; });
-// => ƒ () { return 4 + 5; }
-```
-
-Notice that a representation of the passed-in function was returned, but **it
-was not invoked**. The `iReturnThings()` function accepted the passed-in
-function as its lone argument, `thing`. As with all arguments, `thing` was then
-available everywhere inside `iReturnThings()` as a local variable. When we
-passed a function into `iReturnThings()`, the `thing` variable contained that
-function. Currently, all `iReturnThings()` does is return whatever value is
-stored inside `thing`. However, if we know `thing` contains a function, we can
-do a piece of awesome, function-y magic to it: **we can invoke it** and return
-the function's result:
-
-```js
-function iInvokeThings (thing) {
-  return thing();
-}
-
-iInvokeThings(function () { return 4 + 5; });
-// => 9
-
-iInvokeThings(function () { return 'Hello, ' + 'world!'; });
-// => "Hello, world!"
-```
-
-We pass in a function as the lone argument, store it inside the `thing`
-variable, and then use the invocation operator (a pair of parentheses) to invoke
-the stored function: `thing()`.
-
-***NOTE***: As we dive deeper and deeper into functional programming in
-JavaScript, it bears repeating: this is **very** complicated material!
-JavaScript isn't the only language to treat functions as first-class objects,
-but it's by far the most common and likely the first time you're encountering
-any of this stuff. If you're struggling with the new concepts, don't sweat it!
-Set aside some extra time to re-read and practice, and make sure you're coding
-along with every example we cover in the lessons.
-
-### Callback Functions
-
-If you've done any outside reading on JavaScript, you've probably come across
-the name of the pattern we just introduced: _callback functions_. When we pass a
-function into another function wherein it might be invoked, we refer to the
-passed function as a _callback_. The term derives from the fact that the
-function isn't invoked immediately — instead it's _called back_, or invoked at a
-later point.
-
-You may have noticed, but all of our callback functions so far have been
-_anonymous functions_; that is, we haven't assigned them an identifier. You're
-welcome to name your callback functions if you'd like, but generally it just
-clutters things up if you only use the callback function in one place. And,
-anyway, we already have a way to refer to them: by the name of the parameter
-into which they're passed! For example:
-
-```js
-function main (cb) {
-  console.log(cb());
-}
-
-main(function () { return "After I get passed to the main() function as the only argument, I'm stored in the local 'cb' variable!"});
-// LOG: After I get passed to the main() function as the only argument, I'm stored in the local 'cb' variable!
-```
-
-1. We passed an anonymous function, `function () { return "After I get passed...
-   }`, as the lone argument to our invocation of `main()`.
-2. `main()` stored the passed-in function in the local `cb` variable and then
-   invoked the callback function.
-3. The invoked callback returned its long string, which was `console.log()`-ed
-   out in `main()`.
-
-Because a callback function is invoked inside another function, we can forward
-to it any arguments passed to the outer function. For example:
-
-```js
-function greet (name, cb) {
-  return cb(name);
-}
-
-greet('Ada Lovelace', function (name) { return 'Hello there, ' + name; });
-// => "Hello there, Ada Lovelace"
-
-function doMath (num1, num2, cb) {
-  return cb(num1, num2);
-}
-
-doMath(42, 8, function (num1, num2) { return num1 * num2; });
-// => 336
-```
-
-This behavior makes callbacks the perfect companion for structuring our
-`filter()` function in a slim, reusable way:
+Let's refactor our filter function to take a callback:
 
 ```js
 const users = [
@@ -318,7 +221,9 @@ filter(users, function (user) { return user.favoriteColor === 'Yellow'; });
 Our `filter()` function doesn't know or care about any of the comparison logic
 encapsulated in the callback function. All it does is take in a collection and a
 callback and `console.log()` out the `firstName` of every `user` object that
-makes the callback return `true`.
+makes the callback return `true`. And because we've extracted the logic into a
+separate function, our `filter` now works regardless of how many conditions we
+want to filter on.
 
 ### Pure functions
 
@@ -390,8 +295,8 @@ two reasons:
       follow the data around on a wild goose chase, combing through each impure
       function to see where and how the array is modified.
 
-***Top Tip***: The fewer places a particular object can be modified, the fewer
-places we have to look when debugging.
+> **Top Tip**: The fewer places a particular object can be modified, the fewer
+> places we have to look when debugging.
 
 Here's a pure take on our `randomMultiplyAndFloor()` function:
 
@@ -481,16 +386,18 @@ users.length;
 Woohoo! We successfully built a clone of JavaScript's built-in `.filter()` array
 method!
 
-Wait... **a** ***clone?!***
-
 <picture>
   <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.webp" type="image/webp">
   <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.gif" type="image/gif">
   <img src="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.gif" alt="Our journey has never been one of shortcuts or settling for less.">
 </picture>
 
-Yep, sorry about that. All JavaScript arrays come with their own `.filter()`
-method:
+## Using `Array.prototype.filter()`
+
+Now that we've built our own version of `filter()`, we have a better
+understanding of what JavaScript's built-in `filter()` method is doing for us
+and how it works under the hood. Here's an example of what a call to `filter()`
+might look like:
 
 ```js
 [1, 2, 3, 4, 5].filter(function (num) { return num > 3; });
@@ -499,13 +406,32 @@ method:
 
 The method accepts one argument, a callback function that it will invoke with
 each element in the array. For each element passed to the callback, if the
-callback's return value is truthy, that element is copied into a new array. If
-the callback's return value is falsy, the element is filtered out. After
+callback's return value is `true`, that element is copied into a new array. If
+the callback's return value is `false`, the element is filtered out. After
 iterating over every element in the collection, `.filter()` returns the new
 array.
 
-Now that you've built your own `filter()` method, you have a much deeper grasp
-of how JavaScript's built-in `Array.prototype.filter()` method works.
+## Conclusion
+
+As we've learned in this lesson, using JavaScript's built-in `filter()` method
+enables us to write more efficient, less repetitive code. Specifically:
+
+- We no longer need to create a `for` or `for ... of` loop.
+- In each iteration through the array, the current element is stored in a
+  variable for us. We no longer need to access elements using their index values.
+- A new array is automatically created and returned after the iterations are
+  complete, so we no longer need to create an empty array and push elements into
+  it.
+
+Finally, `Array` methods like `find()`, `filter()` and the other methods we will
+learn about in this section are _expressive_. As soon as we (or other
+developers) see that `filter()` is being called, we know that the code is
+looking for elements in an array that meet a certain condition and returning a
+new array containing those elements. Or if we see that `map()` (which we'll
+learn about next) is being called, we immediately know that the code is
+modifying the elements in an array and returning an array containing the modifed
+values. This makes our code easier to read and understand than if we use a
+generic looping construct.
 
 ## Resources
 
