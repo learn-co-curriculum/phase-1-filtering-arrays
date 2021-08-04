@@ -24,41 +24,41 @@ Let's revisit our array of Flatbook user objects:
 ```js
 const users = [
   {
-    firstName: 'Niky',
-    lastName: 'Morgan',
-    favoriteColor: 'Blue',
-    favoriteAnimal: 'Jaguar'
+    firstName: "Niky",
+    lastName: "Morgan",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Jaguar",
   },
   {
-    firstName: 'Tracy',
-    lastName: 'Lum',
-    favoriteColor: 'Yellow',
-    favoriteAnimal: 'Penguin'
+    firstName: "Tracy",
+    lastName: "Lum",
+    favoriteColor: "Yellow",
+    favoriteAnimal: "Penguin",
   },
   {
-    firstName: 'Josh',
-    lastName: 'Rowley',
-    favoriteColor: 'Blue',
-    favoriteAnimal: 'Penguin'
+    firstName: "Josh",
+    lastName: "Rowley",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Penguin",
   },
   {
-    firstName: 'Kate',
-    lastName: 'Travers',
-    favoriteColor: 'Red',
-    favoriteAnimal: 'Jaguar'
+    firstName: "Kate",
+    lastName: "Travers",
+    favoriteColor: "Red",
+    favoriteAnimal: "Jaguar",
   },
   {
-    firstName: 'Avidor',
-    lastName: 'Turkewitz',
-    favoriteColor: 'Blue',
-    favoriteAnimal: 'Penguin'
+    firstName: "Avidor",
+    lastName: "Turkewitz",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Penguin",
   },
   {
-    firstName: 'Drew',
-    lastName: 'Price',
-    favoriteColor: 'Yellow',
-    favoriteAnimal: 'Elephant'
-  }
+    firstName: "Drew",
+    lastName: "Price",
+    favoriteColor: "Yellow",
+    favoriteAnimal: "Elephant",
+  },
 ];
 ```
 
@@ -66,7 +66,7 @@ To review, we know we can iterate over that collection and print out everyone's
 first name:
 
 ```js
-function firstNamePrinter (collection) {
+function firstNamePrinter(collection) {
   for (const user of collection) {
     console.log(user.firstName);
   }
@@ -84,9 +84,9 @@ firstNamePrinter(users);
 We also know how to print out only users whose favorite color is blue:
 
 ```js
-function blueFilter (collection) {
+function blueFilter(collection) {
   for (const user of collection) {
-    if (user.favoriteColor === 'Blue') {
+    if (user.favoriteColor === "Blue") {
       console.log(user.firstName);
     }
   }
@@ -104,7 +104,7 @@ seems wasteful. Instead, let's just pass in the color that we want to filter
 for as an argument:
 
 ```js
-function colorFilter (collection, color) {
+function colorFilter(collection, color) {
   for (const user of collection) {
     if (user.favoriteColor === color) {
       console.log(user.firstName);
@@ -112,7 +112,7 @@ function colorFilter (collection, color) {
   }
 }
 
-colorFilter(users, 'Red');
+colorFilter(users, "Red");
 // LOG: Kate
 ```
 
@@ -122,7 +122,7 @@ whose favorite animal is a jaguar, and our `colorFilter()` function won't work.
 Let's abstract the function a bit further:
 
 ```js
-function filter (collection, attribute, value) {
+function filter(collection, attribute, value) {
   for (const user of collection) {
     if (user[attribute] === value) {
       console.log(user.firstName);
@@ -130,17 +130,16 @@ function filter (collection, attribute, value) {
   }
 }
 
-filter(users, 'favoriteAnimal', 'Jaguar', );
+filter(users, "favoriteAnimal", "Jaguar");
 // LOG: Niky
 // LOG: Kate
-
 ```
 
 So our function is definitely getting more abstract, but what if we wanted to
 filter by two attributes? We'd have to do something like this:
 
 ```js
-function filter (collection, attribute1, value1, attribute2, value2) {
+function filter(collection, attribute1, value1, attribute2, value2) {
   for (const user of collection) {
     if (user[attribute1] === value1 && user[attribute2] === value2) {
       console.log(user.firstName);
@@ -148,9 +147,8 @@ function filter (collection, attribute1, value1, attribute2, value2) {
   }
 }
 
-filter(users, 'favoriteAnimal', 'Jaguar', 'favoriteColor', 'Blue');
+filter(users, "favoriteAnimal", "Jaguar", "favoriteColor", "Blue");
 // LOG: Niky
-
 ```
 
 This is getting slightly ridiculous by this point. That is **way** too much
@@ -159,7 +157,7 @@ now our filter will only work if we're filtering by two attributes. To fix this,
 we can extract the comparison logic into a separate function:
 
 ```js
-function filter (collection) {
+function filter(collection) {
   for (const user of collection) {
     if (likesElephants(user)) {
       console.log(user.firstName);
@@ -167,8 +165,8 @@ function filter (collection) {
   }
 }
 
-function likesElephants (user) {
-  return user['favoriteAnimal'] === 'Elephant';
+function likesElephants(user) {
+  return user["favoriteAnimal"] === "Elephant";
 }
 
 filter(users);
@@ -183,25 +181,49 @@ our `filter()` function can only make comparisons using `likesElephants()`. If
 we want to use a different comparison function, we'd have to rewrite `filter()`.
 However, there is another way: we can use a callback function!
 
-<picture>
-  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.webp" type="image/webp">
-  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.gif" type="image/gif">
-  <img src="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/maybe_theres_another_way.gif" alt="Maybe there's another way.">
-</picture>
-
 Let's refactor our filter function to take a callback:
 
 ```js
 const users = [
-  { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
-  { firstName: 'Tracy',  lastName: 'Lum',       favoriteColor: 'Yellow', favoriteAnimal: 'Penguin' },
-  { firstName: 'Josh',   lastName: 'Rowley',    favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
-  { firstName: 'Kate',   lastName: 'Travers',   favoriteColor: 'Red',    favoriteAnimal: 'Jaguar' },
-  { firstName: 'Avidor', lastName: 'Turkewitz', favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
-  { firstName: 'Drew',   lastName: 'Price',     favoriteColor: 'Yellow', favoriteAnimal: 'Elephant' }
+  {
+    firstName: "Niky",
+    lastName: "Morgan",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Jaguar",
+  },
+  {
+    firstName: "Tracy",
+    lastName: "Lum",
+    favoriteColor: "Yellow",
+    favoriteAnimal: "Penguin",
+  },
+  {
+    firstName: "Josh",
+    lastName: "Rowley",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Penguin",
+  },
+  {
+    firstName: "Kate",
+    lastName: "Travers",
+    favoriteColor: "Red",
+    favoriteAnimal: "Jaguar",
+  },
+  {
+    firstName: "Avidor",
+    lastName: "Turkewitz",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Penguin",
+  },
+  {
+    firstName: "Drew",
+    lastName: "Price",
+    favoriteColor: "Yellow",
+    favoriteAnimal: "Elephant",
+  },
 ];
 
-function filter (collection, cb) {
+function filter(collection, cb) {
   for (const user of collection) {
     if (cb(user)) {
       console.log(user.firstName);
@@ -209,11 +231,15 @@ function filter (collection, cb) {
   }
 }
 
-filter(users, function (user) { return user.favoriteColor === 'Blue' && user.favoriteAnimal === 'Penguin'; });
+filter(users, function (user) {
+  return user.favoriteColor === "Blue" && user.favoriteAnimal === "Penguin";
+});
 // LOG: Josh
 // LOG: Avidor
 
-filter(users, function (user) { return user.favoriteColor === 'Yellow'; });
+filter(users, function (user) {
+  return user.favoriteColor === "Yellow";
+});
 // LOG: Tracy
 // LOG: Drew
 ```
@@ -245,7 +271,7 @@ passed in as arguments.
 This function is impure because the return value is not predictable:
 
 ```js
-function randomMultiplyAndFloor () {
+function randomMultiplyAndFloor() {
   return Math.floor(Math.random() * 100);
 }
 
@@ -259,12 +285,14 @@ This one's impure because it alters the passed-in object:
 
 ```js
 const ada = {
-  name: 'Ada Lovelace',
-  age: 202
+  name: "Ada Lovelace",
+  age: 202,
 };
 
-function happyBirthday (person) {
-  console.log(`Happy birthday, ${person.name}! You're ${++person.age} years old!`);
+function happyBirthday(person) {
+  console.log(
+    `Happy birthday, ${person.name}! You're ${++person.age} years old!`
+  );
 }
 
 happyBirthday(ada);
@@ -286,14 +314,14 @@ two reasons:
 2. Because pure functions don't have side effects, it makes debugging a lot
    easier. Imagine that our code errors out due to an array that doesn't contain
    the correct properties.
-    - If that array was returned from a pure function, our debugging process
-      would be linear and well-scoped. We would first check what inputs were
-      provided to the pure function. If the inputs are correct, that means the
-      bug is inside our pure function. If the inputs aren't correct, then we
-      figure out why they aren't correct. Case closed!
-    - If, however, the array is modified by impure functions, we'd have to
-      follow the data around on a wild goose chase, combing through each impure
-      function to see where and how the array is modified.
+   - If that array was returned from a pure function, our debugging process
+     would be linear and well-scoped. We would first check what inputs were
+     provided to the pure function. If the inputs are correct, that means the
+     bug is inside our pure function. If the inputs aren't correct, then we
+     figure out why they aren't correct. Case closed!
+   - If, however, the array is modified by impure functions, we'd have to
+     follow the data around on a wild goose chase, combing through each impure
+     function to see where and how the array is modified.
 
 > **Top Tip**: The fewer places a particular object can be modified, the fewer
 > places we have to look when debugging.
@@ -301,7 +329,7 @@ two reasons:
 Here's a pure take on our `randomMultiplyAndFloor()` function:
 
 ```js
-function multiplyAndFloor (num) {
+function multiplyAndFloor(num) {
   return Math.floor(num * 100);
 }
 
@@ -320,14 +348,16 @@ And one that returns a new object instead of mutating the passed-in object:
 
 ```js
 const adaAge202 = {
-  name: 'Ada Lovelace',
-  age: 202
+  name: "Ada Lovelace",
+  age: 202,
 };
 
-function happyBirthday (person) {
+function happyBirthday(person) {
   const newPerson = Object.assign({}, person, { age: person.age + 1 });
 
-  console.log(`Happy birthday, ${newPerson.name}! You're ${newPerson.age} years old!`);
+  console.log(
+    `Happy birthday, ${newPerson.name}! You're ${newPerson.age} years old!`
+  );
 
   return newPerson;
 }
@@ -349,15 +379,45 @@ that returns a new array containing the filtered elements:
 
 ```js
 const users = [
-  { firstName: 'Niky',   lastName: 'Morgan',    favoriteColor: 'Blue',   favoriteAnimal: 'Jaguar' },
-  { firstName: 'Tracy',  lastName: 'Lum',       favoriteColor: 'Yellow', favoriteAnimal: 'Penguin' },
-  { firstName: 'Josh',   lastName: 'Rowley',    favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
-  { firstName: 'Kate',   lastName: 'Travers',   favoriteColor: 'Red',    favoriteAnimal: 'Jaguar' },
-  { firstName: 'Avidor', lastName: 'Turkewitz', favoriteColor: 'Blue',   favoriteAnimal: 'Penguin' },
-  { firstName: 'Drew',   lastName: 'Price',     favoriteColor: 'Yellow', favoriteAnimal: 'Elephant' }
+  {
+    firstName: "Niky",
+    lastName: "Morgan",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Jaguar",
+  },
+  {
+    firstName: "Tracy",
+    lastName: "Lum",
+    favoriteColor: "Yellow",
+    favoriteAnimal: "Penguin",
+  },
+  {
+    firstName: "Josh",
+    lastName: "Rowley",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Penguin",
+  },
+  {
+    firstName: "Kate",
+    lastName: "Travers",
+    favoriteColor: "Red",
+    favoriteAnimal: "Jaguar",
+  },
+  {
+    firstName: "Avidor",
+    lastName: "Turkewitz",
+    favoriteColor: "Blue",
+    favoriteAnimal: "Penguin",
+  },
+  {
+    firstName: "Drew",
+    lastName: "Price",
+    favoriteColor: "Yellow",
+    favoriteAnimal: "Elephant",
+  },
 ];
 
-function filter (collection, cb) {
+function filter(collection, cb) {
   const newCollection = [];
 
   for (const user of collection) {
@@ -369,12 +429,16 @@ function filter (collection, cb) {
   return newCollection;
 }
 
-const bluePenguinUsers = filter(users, function (user) { return user.favoriteColor === 'Blue' && user.favoriteAnimal === 'Penguin'; });
+const bluePenguinUsers = filter(users, function (user) {
+  return user.favoriteColor === "Blue" && user.favoriteAnimal === "Penguin";
+});
 
 bluePenguinUsers;
 // => [{ firstName: "Josh", lastName: "Rowley", favoriteColor: "Blue", favoriteAnimal: "Penguin" }, { firstName: "Avidor", lastName: "Turkewitz", favoriteColor: "Blue", favoriteAnimal: "Penguin" }]
 
-const yellowUsers = filter(users, function (user) { return user.favoriteColor === 'Yellow'; });
+const yellowUsers = filter(users, function (user) {
+  return user.favoriteColor === "Yellow";
+});
 
 yellowUsers;
 // => [{ firstName: "Tracy", lastName: "Lum", favoriteColor: "Yellow", favoriteAnimal: "Penguin" }, { firstName: "Drew", lastName: "Price", favoriteColor: "Yellow", favoriteAnimal: "Elephant" }]
@@ -386,12 +450,6 @@ users.length;
 Woohoo! We successfully built a clone of JavaScript's built-in `.filter()` array
 method!
 
-<picture>
-  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.webp" type="image/webp">
-  <source srcset="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.gif" type="image/gif">
-  <img src="https://curriculum-content.s3.amazonaws.com/web-development/js/looping-and-iteration/filter-readme/no_shortcuts.gif" alt="Our journey has never been one of shortcuts or settling for less.">
-</picture>
-
 ## Using `Array.prototype.filter()`
 
 Now that we've built our own version of `filter()`, we have a better
@@ -400,7 +458,9 @@ and how it works under the hood. Here's an example of what a call to `filter()`
 might look like:
 
 ```js
-[1, 2, 3, 4, 5].filter(function (num) { return num > 3; });
+[1, 2, 3, 4, 5].filter(function (num) {
+  return num > 3;
+});
 // => [4, 5]
 ```
 
@@ -429,9 +489,9 @@ developers) see that `filter()` is being called, we know that the code is
 looking for elements in an array that meet a certain condition and returning a
 new array containing those elements. Or if we see that `map()` (which we'll
 learn about next) is being called, we immediately know that the code is
-modifying the elements in an array and returning an array containing the modifed
-values. This makes our code easier to read and understand than if we use a
-generic looping construct.
+modifying the elements in an array and returning an array containing the
+modified values. This makes our code easier to read and understand than if we
+use a generic looping construct.
 
 ## Resources
 
