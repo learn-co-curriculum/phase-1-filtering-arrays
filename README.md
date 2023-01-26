@@ -14,8 +14,8 @@ We've seen the `Array` methods available in JavaScript to find a _single_
 element, but sometimes we want to return _all_ elements that match a certain
 condition. For example, we might want to search through an array and return
 values greater than one (`[1, 2, 3]` -> `[2, 3]`). In the JavaScript world, we
-refer to that search process as _filtering_ an array. In this lesson we're
-going to build our own `filter()` function.
+refer to that search process as _filtering_ an array. In this lesson we're going
+to build our own `filter()` function.
 
 ## Filter
 
@@ -100,8 +100,8 @@ blueFilter(users);
 
 Now what if we want to filter our collection of users for those whose favorite
 color is red? We could define an entirely new function, `redFilter()`, but that
-seems wasteful. Instead, let's just pass in the color that we want to filter
-for as an argument:
+seems wasteful. Instead, let's just pass in the color that we want to filter for
+as an argument:
 
 ```js
 function colorFilter(collection, color) {
@@ -319,9 +319,9 @@ two reasons:
      provided to the pure function. If the inputs are correct, that means the
      bug is inside our pure function. If the inputs aren't correct, then we
      figure out why they aren't correct. Case closed!
-   - If, however, the array is modified by impure functions, we'd have to
-     follow the data around on a wild goose chase, combing through each impure
-     function to see where and how the array is modified.
+   - If, however, the array is modified by impure functions, we'd have to follow
+     the data around on a wild goose chase, combing through each impure function
+     to see where and how the array is modified.
 
 > **Top Tip**: The fewer places a particular object can be modified, the fewer
 > places we have to look when debugging.
@@ -478,7 +478,8 @@ enables us to write more efficient, less repetitive code. Specifically:
 
 - We no longer need to create a `for` or `for ... of` loop.
 - In each iteration through the array, the current element is stored in a
-  variable for us. We no longer need to access elements using their index values.
+  variable for us. We no longer need to access elements using their index
+  values.
 - A new array is automatically created and returned after the iterations are
   complete, so we no longer need to create an empty array and push elements into
   it.
@@ -498,5 +499,6 @@ use a generic looping construct.
 - [MDN — `Array.prototype.filter()`][filter]
 - [Tutorial Horizon — Pure vs. Impure Functions][pure]
 
-[filter]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-[pure]: http://javascript.tutorialhorizon.com/2016/04/24/pure-vs-impure-functions/
+[filter]:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+[pure]: https://tutorialhorizon.com/javascript/pure-vs-impure-functions/
