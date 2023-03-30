@@ -10,6 +10,14 @@
 
 ## Introduction
 
+| Use Case                                                          | Method                |
+| ----------------------------------------------------------------- | --------------------- |
+| Executing a provided callback on each element                     | `forEach()`           |
+| Finding a single element that meets a condition                   | `find()`, `indexOf()` |
+| ** Finding and returning a list of elements that meet a condition | `filter()`            |
+| Modifying each element and returning the modified array           | `map()`               |
+| Creating a summary or aggregation of values in an array           | `reduce()`            |
+
 We've seen the `Array` methods available in JavaScript to find a _single_
 element, but sometimes we want to return _all_ elements that match a certain
 condition. For example, we might want to search through an array and return
@@ -17,9 +25,26 @@ values greater than one (`[1, 2, 3]` -> `[2, 3]`). In the JavaScript world, we
 refer to that search process as _filtering_ an array. In this lesson we're going
 to build our own `filter()` function.
 
+**Note:** In this lesson, we'll be creating our own `filter()` function and
+showing how JavaScript's built-in `filter()` _method_ can save us a lot of
+work. The built-in `filter()` method belongs to JavaScript's `Array` prototype.
+As we've learned, this means that it is _called on_ an instance of an array. For
+example, we can call the `Array.prototype.push()` method as follows:
+
+```js
+[1, 2, 3].push(4);
+```
+
+The version of the `filter()` method that we'll be creating, on the other hand,
+is a _function_. Instead of calling it on an array, we will pass the array to it
+as an argument: `filter(arr)`. Because our version will share the same name as
+the built-in method, paying attention to this difference will help avoid
+confusion.
+
 ## Filter
 
-Let's revisit our array of Flatbook user objects:
+Let's revisit the example we looked at in an earlier lesson, using the array of
+Flatbook user objects:
 
 ```js
 const users = [
@@ -62,8 +87,8 @@ const users = [
 ];
 ```
 
-To review, we know we can iterate over that collection and print out everyone's
-first name:
+We know we can iterate over that collection using `for...of` and print out
+everyone's first name:
 
 ```js
 function firstNamePrinter(collection) {
@@ -305,6 +330,9 @@ ada;
 // => {name: "Ada Lovelace", age: 204}
 ```
 
+By using the `++` operator on the `age` property, we're changing the passed-in
+object in our function.
+
 When possible, it's generally good to avoid impure functions for the following
 two reasons:
 
@@ -344,38 +372,19 @@ multiplyAndFloor(randNum);
 // => 91
 ```
 
-And one that returns a new object instead of mutating the passed-in object:
+The randomization is now happening _outside_ our function, so the return value
+of `multiplyAndFloor` will always be the same for a given input.
 
-```js
-const adaAge202 = {
-  name: "Ada Lovelace",
-  age: 202,
-};
-
-function happyBirthday(person) {
-  const newPerson = Object.assign({}, person, { age: person.age + 1 });
-
-  console.log(
-    `Happy birthday, ${newPerson.name}! You're ${newPerson.age} years old!`
-  );
-
-  return newPerson;
-}
-
-const adaAge203 = happyBirthday(adaAge202);
-// LOG: Happy birthday, Ada Lovelace! You're 203 years old!
-
-adaAge202;
-// => {name: "Ada Lovelace", age: 202}
-
-adaAge203;
-// => {name: "Ada Lovelace", age: 203}
-```
+For our `happyBirthday()` function, we could make it pure by first cloning the
+passed-in object then modifying the clone instead. We'll learn how to do that in
+a later lesson.
 
 ## Tying it all together
 
-As a final challenge, let's rewrite our `filter()` function as a pure function
-that returns a new array containing the filtered elements:
+As a final challenge, let's rewrite our `filter()` function so it returns an
+array containing the filtered elements. We'll make it a pure function by
+creating a new array to contain the filtered elements and returning that array
+at the end:
 
 ```js
 const users = [
@@ -447,7 +456,7 @@ users.length;
 // => 6
 ```
 
-Woohoo! We successfully built a clone of JavaScript's built-in `.filter()` array
+Woohoo! We successfully built a clone of JavaScript's built-in `filter()` array
 method!
 
 ## Using `Array.prototype.filter()`
@@ -468,18 +477,28 @@ The method accepts one argument, a callback function that it will invoke with
 each element in the array. For each element passed to the callback, if the
 callback's return value is `true`, that element is copied into a new array. If
 the callback's return value is `false`, the element is filtered out. After
-iterating over every element in the collection, `.filter()` returns the new
+iterating over every element in the collection, `filter()` returns the new
 array.
+
+Again, notice how similar `filter()` is to `find()`. Both methods are called on
+an array and take a callback as an argument. Both automatically iterate through
+the passed-in array and call the callback on each element. Both automatically
+pass the element, the element's index, and the array itself to the callback
+(we're only using the element itself in this example).
+
+The only difference between them is what is returned: `find()` returns a
+_single value_, the first element in the array that meets the search condition
+(or `undefined` if no matching element is found), while `filter()` returns an
+array containing _all_ the elements that meet the search condition.
 
 ## Conclusion
 
 As we've learned in this lesson, using JavaScript's built-in `filter()` method
 enables us to write more efficient, less repetitive code. Specifically:
 
-- We no longer need to create a `for` or `for ... of` loop.
+- We no longer need to create a `for` or `for...of` loop.
 - In each iteration through the array, the current element is stored in a
-  variable for us. We no longer need to access elements using their index
-  values.
+  variable for us.
 - A new array is automatically created and returned after the iterations are
   complete, so we no longer need to create an empty array and push elements into
   it.
@@ -488,11 +507,11 @@ Finally, `Array` methods like `find()`, `filter()` and the other methods we will
 learn about in this section are _expressive_. As soon as we (or other
 developers) see that `filter()` is being called, we know that the code is
 looking for elements in an array that meet a certain condition and returning a
-new array containing those elements. Or if we see that `map()` (which we'll
-learn about next) is being called, we immediately know that the code is
-modifying the elements in an array and returning an array containing the
-modified values. This makes our code easier to read and understand than if we
-use a generic looping construct.
+new array containing those elements. Or if we see that `map()` is being called,
+we immediately know that the code is modifying each of the elements in an array
+and returning an array containing the modified values. (We'll learn about
+`map()` in the next lesson.) This expressiveness makes our code easier to read
+and understand than if we use a generic looping construct.
 
 ## Resources
 
