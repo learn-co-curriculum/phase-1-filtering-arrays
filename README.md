@@ -516,8 +516,8 @@ and understand than if we use a generic looping construct.
 ## Resources
 
 - [MDN — `Array.prototype.filter()`][filter]
-- [Tutorial Horizon — Pure vs. Impure Functions][pure]
+- [FreeCodeCamp What is a Pure Function in JavaScript?][pure]
 
 [filter]:
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-[pure]: https://tutorialhorizon.com/javascript/pure-vs-impure-functions/
+[pure]: https://www.freecodecamp.org/news/what-is-a-pure-function-in-javascript-acb887375dfe/
